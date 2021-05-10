@@ -1,8 +1,11 @@
 <template>
+ <amplify-authenticator>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
     <HelloWorld msg="Welcome to Your Vue.js App v2"/>
   </div>
+  <amplify-sign-out></amplify-sign-out>
+ </amplify-authenticator>
 </template>
 
 <script>
