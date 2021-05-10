@@ -8,6 +8,8 @@
     <div v-for="item in notes" :key="item.id">
       <h3>{{ item.name }}</h3>
       <p>{{ item.description }}</p>
+      <p>{{ item.done }}</p>
+      <br/>
     </div>
   </div>
   <amplify-sign-out></amplify-sign-out>
@@ -15,53 +17,54 @@
 </template>
 
 <script>
-import { API } from 'aws-amplify';
-import { createNote } from './graphql/mutations';
-import { listNotes } from './graphql/queries';
-import { onCreateNote } from './graphql/subscriptions';
+//import { API } from 'aws-amplify';
+//import { createNote } from './graphql/mutations';
+//import { listNotes } from './graphql/queries';
+//import { onCreateNote } from './graphql/subscriptions';
+import { DataStore } from  '@aws-amplify/datastore';
+import { Note } from '@/models';
 
 export default {
   name: 'App',
-  async created() {
-    this.getNotes();
-  },
   data(){
     return {
       name: '',
       description: '',
-      notes: []
+      notes: [],
+      done: '',
+      subscription: undefined
     }
   },
   components: {
   },
+  created: function(){
+    //Subscribe to changes
+    this.subscription = DataStore.observe(Note).subscribe(msg => {
+      console.log(msg.model, msg.opType, msg.element);
+      this.listNotes();
+    });
+  }, 
+  destroyed() {
+    if (!this.subscription) return;
+    this.subscription.unsubscribe();
+  },
   methods: {
-    async createNote() {
-      const { name, description } = this;
-      if (!name || !description) return;
-      const note = { name, description };
-      await API.graphql({
-        query: createNote,
-        variables: {input: note},
-      });
+   async  createNote() {
+     const note = await DataStore.save(
+         new Note({
+           name: this.name,
+           description: this.description,
+           done: false
+         })
+      );
+      console.log(note)
       this.name = '';
       this.description = '';
     },
-    async getNotes() {
-      const notes = await API.graphql({
-        query: listNotes
-      });
-      this.notes = notes.data.listNotes.items;
+   async  listNotes() {
+      this.notes = await DataStore.query(Note);
+      console.log(JSON.stringify(this.notes,null,2))
     },
-    subscribe() {
-      API.graphql({ query: onCreateNote })
-        .subscribe({
-          next: (eventData) => {
-            let note = eventData.value.data.onCreateNote;
-            if (this.notes.some(item => item.name === note.name)) return; // remove duplications
-            this.notes = [...this.notes, note];
-          }
-        });
-    }
   }
 }
 </script>
