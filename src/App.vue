@@ -5,6 +5,14 @@
     <input type="text" v-model="name" placeholder="Note name">
     <input type="text" v-model="description" placeholder="Note description">
     <button v-on:click="createNote">Create Note</button>
+    <br/>
+    <input type="text" v-model="id" placeholder="Note id">
+    <input type="text" v-model="description" placeholder="Note description">
+    <button v-on:click="updateNote">Update Note</button>
+    <br/>
+    <input type="text" v-model="id" placeholder="Note id">
+    <button v-on:click="deleteNote">delete Note</button>
+    
     <div v-for="item in notes" :key="item.id">
       <h3>{{ item.name }}</h3>
       <p>{{ item.description }}</p>
@@ -31,8 +39,9 @@ export default {
       name: '',
       description: '',
       notes: [],
-      done: '',
-      subscription: undefined
+      done: false,
+      subscription: undefined,
+      id: ""
     }
   },
   components: {
@@ -62,9 +71,25 @@ export default {
       this.description = '';
     },
    async  listNotes() {
-      this.notes = await DataStore.query(Note);
+      //this.notes = await DataStore.query(Note, Predicates.ALL, {
+      //page: 0,
+      //limit: 2
+      this.notes = await DataStore.query(Note, c => c.description("contains", "x"))
       console.log(JSON.stringify(this.notes,null,2))
     },
+   async updateNote(){
+     const original = await DataStore.query(Note, this.id);
+
+     await DataStore.save(
+      Note.copyOf(original, updated => {
+        updated.description = this.description;
+      })
+    );
+   },
+   async deleteNote(){
+     const notedelete = await DataStore.query(Note, this.id);
+     DataStore.delete(notedelete);
+   }
   }
 }
 </script>
