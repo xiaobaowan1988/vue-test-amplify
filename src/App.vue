@@ -67,8 +67,23 @@
                       <p>{{editedItem.description}}</p>
                     </v-col>
                   </v-row>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.content"
+                        label="Note content"
+                      ></v-text-field>
+                      <p>{{editedItem.content}}</p>
+                    </v-col>
+                 </v-row>                  
                 </v-container>
               </v-card-text>
+
+
   
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -146,6 +161,7 @@ export default{
         value: 'name',
       },
       { text: 'Description', value: 'description' },
+      { text: 'Content', value: 'content' },
       { text: 'Done', value: 'done' },
       { text: 'Actions', value: 'actions', sortable: false },
     ],
@@ -155,12 +171,14 @@ export default{
       id: '',
       name: '',
       description: '',
+      content: '',
       done: false,
     },
     defaultItem: {
       id: '',
       name: '',
       description: '',
+      content: '',
       done: false,
     },
   }),
@@ -201,13 +219,15 @@ export default{
      //const original = await DataStore.query(Note, this.id);
      console.log("before update",item)
 
-     const original = item
+     const original = await DataStore.query(Note, item.id);
+
 
      this.editedIndex = this.notes.indexOf(item)
      this.editedItem = Object.assign({}, item)
      await DataStore.save(
        Note.copyOf(original, updated => {
-         updated.name = `name ${Date.now()}`;
+         updated.name = this.editedItem.name;
+
     })  
   );
     this.dialog = true
@@ -271,12 +291,14 @@ export default{
         new Note({
            name: this.editedItem.name,
            description: this.editedItem.description,
+           content: this.editedItem.content,
            done: this.editedItem.done
          })
       );
       console.log(note)
       this.name = '';
       this.description = '';
+      this.content ='',
       this.close()
       }
       this.close()

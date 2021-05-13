@@ -30,6 +30,13 @@ export const schema = {
                     "type": "Boolean",
                     "isRequired": false,
                     "attributes": []
+                },
+                "content": {
+                    "name": "content",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
                 }
             },
             "syncable": true,
@@ -44,5 +51,5 @@ export const schema = {
     },
     "enums": {},
     "nonModels": {},
-    "version": "044314f87413e09191a94c75cc6b7ad8"
+    "version": "7ffb00bdefedb641dcf8f7c901f7dca8"
 };

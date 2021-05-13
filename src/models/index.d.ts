@@ -9,6 +9,7 @@ export declare class Note {
   readonly name: string;
   readonly description?: string;
   readonly done?: boolean;
+  readonly content?: string;
   constructor(init: ModelInit<Note>);
   static copyOf(source: Note, mutator: (draft: MutableModel<Note>) => MutableModel<Note> | void): Note;
 }
